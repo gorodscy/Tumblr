@@ -1,5 +1,5 @@
 var https = require('https');
-var url = 'https://api.tumblr.com/v2/blog/gorodscy.tumblr.com/likes?\
+var url = 'https://api.tumblr.com/v2/blog/theatlantic.tumblr.com/likes?\
 api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 
 
@@ -31,7 +31,7 @@ var get_request = https.get(url, function(res) {
 		var liked = j.response.liked_count;
  
 		// For each post liked by the user (Limited to the last 20 posts)
-		for(var i=0; i<liked; i++){
+		for(var i=0; i<liked && i<20; i++){
 
 			/// Display post information:
 
