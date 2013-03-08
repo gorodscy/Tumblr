@@ -1,31 +1,29 @@
 // Export the functions to be used in other files.
 // OBS: Other files should evoke require('./fileManager.js'); (if in the same dir)
-module.exports.writePost = writePost;
 module.exports.writePosts = writePosts;
 module.exports.readPosts = readPosts;
 
 var fs = require('fs');
 
-// Writing a post in a file:
-function writePost(post){
-	
-	var string = JSON.stringify(post);
-	var fs = require('fs');
-	fs.writeFile('post.txt', string, function (err) {
-	  if (err) throw err; {
-		console.log('Post succesfully saved!');
-	  }
-	});
-}
-
 // Writing many posts in a file:
 function writePosts(posts){
 	var string = JSON.stringify(posts);
 	var fs = require('fs');
+	
+	//get Timestamp
+	var timestamp=new Date();
+	
+	// For the future: Save the timestamp and append instead of writing, to keep track
+	/*
+	fs.appendFile('posts.txt', timestamp.toString(), function (err) {
+		if (err) throw err;
+	});
+	fs.appendFile('posts.txt', string, function (err) {
+	  	if (err) throw err; 
+	});
+	*/
 	fs.writeFile('posts.txt', string, function (err) {
-	  if (err) throw err; {
-		console.log('All posts were saved!');
-	  }
+	  	if (err) throw err; 
 	});
 }
 
