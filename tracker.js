@@ -31,7 +31,7 @@ function trackBlog(url){
 			var j = JSON.parse(data);
 		
 			file.writePosts(j);
-			file.readPosts();
+			//file.readPosts();
 		
 		});
 
