@@ -5,8 +5,7 @@ var get_options = {
     // (no http/https !)
     port : 443,
     // the rest of the url with parameters if needed
-    path : '/v2/blog/ystallonne.tumblr.com/info?\
-    		api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp', 
+    path : '/v2/blog/ystallonne.tumblr.com/info?api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp', 
     method : 'GET' // do GET
 };
 
@@ -17,7 +16,7 @@ var get_request = https.request(get_options, function(res) {
 //    console.log("headers: ", res.headers);
 
 
-    res.on('response', function(d) {
+    res.on('data', function(d) {
         console.info('GET result:\n');
         process.stdout.write(d);
         console.info('\n\nCall completed');
