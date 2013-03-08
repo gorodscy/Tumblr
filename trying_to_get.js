@@ -1,0 +1,30 @@
+var https = require('https');
+
+var get_options = {
+	host : 'api.tumblr.com', // here only the domain name
+    // (no http/https !)
+    port : 443,
+    // the rest of the url with parameters if needed
+    path : '/v2/blog/ystallonne.tumblr.com/info?\
+    		api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp', 
+    method : 'GET' // do GET
+};
+
+// do the GET request
+var get_request = https.request(get_options, function(res) {
+    console.log("statusCode: ", res.statusCode);
+    // uncomment it for header details
+//    console.log("headers: ", res.headers);
+
+
+    res.on('response', function(d) {
+        console.info('GET result:\n');
+        process.stdout.write(d);
+        console.info('\n\nCall completed');
+    });
+});
+
+get_request.end();
+get_request.on('error', function(e) {
+    console.error(e);
+});
