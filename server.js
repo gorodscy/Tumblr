@@ -14,14 +14,14 @@ function everyhourFunction() {
 	// Code to be executed:
 
 	var blog_list = null;
-/*
+
   	blog_list = file.saveBlog(blog_list, 'https://api.tumblr.com/v2/blog/gorodscy.tumblr.com/likes?\
 api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
 	blog_list = file.saveBlog(blog_list, 'https://api.tumblr.com/v2/blog/ystallonne.tumblr.com/likes?\
 api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
 	blog_list = file.saveBlog(blog_list, 'https://api.tumblr.com/v2/blog/wakkuu.tumblr.com/likes?\
 api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
-*/
+
   
  	 blog_list = file.readBlogs();
  	 
@@ -30,12 +30,3 @@ api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
 
 // [If necessary] Removing the running condition:
 //clearInterval(interval);
-
-https.createServer(function(request, response) {
-	
-	if(request.url == '/'){
-	
-	}
-	
-	
-});

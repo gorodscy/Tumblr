@@ -37,9 +37,7 @@ function saveBlog(blog_list, url){
 	 	}
 	 }
 	
-	fs.writeFile('blogs.txt', string, function (err) {
-		if(err) throw err;
-	});
+	fs.writeFileSync('blogs.txt', string);
 	
 	// Update blog_list:
 	blog_list = JSON.parse(string);
