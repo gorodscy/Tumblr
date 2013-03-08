@@ -5,7 +5,7 @@ var get_options = {
     // (no http/https !)
     port : 443,
     // the rest of the url with parameters if needed
-    path : '/v2/blog/ystallonne.tumblr.com/info?api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp', 
+    path : '/v2/blog/gorodscy.tumblr.com/info?api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp', 
     method : 'GET' // do GET
 };
 
