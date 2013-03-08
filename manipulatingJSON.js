@@ -5,6 +5,9 @@ post.content = "Post's content";
 post.date = "1/1/2013";
 post.note_count = "400";
 
+trackBlog('https://api.tumblr.com/v2/blog/theatlantic.tumblr.com/likes?\
+api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
+
 // Writing a post in a file:
 var string = JSON.stringify(post);
 var fs = require('fs');
