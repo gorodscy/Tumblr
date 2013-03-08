@@ -5,7 +5,7 @@ var get_options = {
     // (no http/https !)
     port : 443,
     // the rest of the url with parameters if needed
-    path : '/v2/blog/gorodscy.tumblr.com/info?api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp', 
+    path : '/v2/blog/ystallonne.tumblr.com/likes?api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp', 
     method : 'GET' // do GET
 };
 
@@ -20,6 +20,12 @@ var get_request = https.request(get_options, function(res) {
         console.info('GET result:\n');
         process.stdout.write(d);
         console.info('\n\nCall completed');
+        console.log(d);
+        var j = JSON.parse(d);
+        console.log(j);
+        
+       
+        
     });
 });
 

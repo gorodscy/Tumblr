@@ -45,11 +45,11 @@ fs.writeFile('posts.txt', string, function (err) {
 fs.readFile('posts.txt', function (err, data) {
 	if (err) throw err; {
 		var post = JSON.parse(data); 
-		console.log(posts[0]);// Getting the whole first post
-		console.log(posts[0].content); // Only first post's content field
-		console.log(posts[1].url); // Only first post's URL field
-		console.log(posts[1].date); // Only second post's date field
-		console.log(posts[2].note_count); // Only third post's note_count field
-		console.log(posts[3].authors); // Authors' names - another example of data being saved
+		console.log(post[0]);// Getting the whole first post
+		console.log(post[0].content); // Only first post's content field
+		console.log(post[1].url); // Only first post's URL field
+		console.log(post[1].date); // Only second post's date field
+		console.log(post[2].note_count); // Only third post's note_count field
+		console.log(post[3].authors); // Authors' names - another example of data being saved
 	}
 });
