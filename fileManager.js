@@ -5,14 +5,18 @@ module.exports.readPosts = readPosts;
 module.exports.saveBlog = saveBlog;
 module.exports.readBlogs = readBlogs;
 
-var blog_count = 0;
-
 // Write blog track list
 function saveBlog(blog_list, url){
 	var fs = require('fs');
 	
+	var blog_count = 0;
+	
+	if (blog_list != null){
+		var blog_count = blog_list.count;
+	}
+	
 	var string = '{"count":' + (blog_count+1) + ',';
-	// If first blog saved
+	// If first blog
 	if(blog_count == 0){
 	 	string += '"blog":["' + url + '"]}';
 	 }
@@ -39,35 +43,16 @@ function saveBlog(blog_list, url){
 	
 	// Update blog_list:
 	blog_list = JSON.parse(string);
-	
-	blog_count += 1;
 	return JSON.parse(string);
 }
 
 // Read blog track list
-function readBlogs(blog_list){
+function readBlogs(){
 	var fs = require('fs');
+	var j;
 	
-	fs.readFile('blogs.txt', function (err, data) {
-		if(err) throw err;
-		
-		var count = 0;
-		var j = JSON.parse(data, reviver);
-		
-		// Function to count how many blogs has been tracked
-		function reviver(key, value){
-			if(typeof value === 'string'){
-				count += 1;
-			}
-			return value;
-		}
-		
-		blog_list = j;
-		
-		//console.log(JSON.stringify(blog_list.blog[0]));
-		return count;
-		
-	});
+	j = fs.readFileSync('blogs.txt');
+	return JSON.parse(j);
 }
 
 // Writing many posts in a file:
@@ -78,15 +63,9 @@ function writePosts(posts){
 	//get Timestamp
 	var timestamp=new Date();
 	
-	// For the future: Save the timestamp and append instead of writing, to keep track
-	/*
-	fs.appendFile('posts.txt', timestamp.toString(), function (err) {
-		if (err) throw err;
-	});
-	fs.appendFile('posts.txt', string, function (err) {
-	  	if (err) throw err; 
-	});
-	*/
+	// Insert timestamp
+	//string = timestamp + string;
+	
 	fs.writeFile('posts.txt', string, function (err) {
 	  	if (err) throw err; 
 	});

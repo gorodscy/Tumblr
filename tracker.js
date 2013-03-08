@@ -1,6 +1,6 @@
 // Export the function trackBlog to be used in other files.
 // OBS: Other files should evoke require('./tracker.js'); (if in the same dir)
-module.exports.trackBlog = trackBlog;
+module.exports.trackBlogs = trackBlogs;
 
 function trackBlog(url){
 	
@@ -42,7 +42,21 @@ function trackBlog(url){
 	get_request.on('error', function(e) {
 		console.error(e);
 	});
-	
-	
 
+}
+
+function trackBlogs(blog_list){
+	
+	//For each blog
+	for(var i=0; i<blog_list.count; i++){
+		
+		var string = JSON.stringify(blog_list.blog[i]);
+		
+		// Remove quotation marks
+		string = string.replace(/\"/g, "");
+		
+		trackBlog(string);
+		
+	}
+	
 }
