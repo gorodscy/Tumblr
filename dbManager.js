@@ -73,15 +73,18 @@ function closeDB(){
 function saveBlog(hostname, liked_count, liked_posts){
 	
 	// Test if hostname already exists in DB
-	// If not:
+	connection.query('SELECT * FROM blog WHERE hostname = "' + hostname + '"', function(err, rows){
+		if(err) throw err;
+		
+		if(rows == undefined){
+			connection.query('INSERT INTO blog (hostname, liked_count) VALUES (?, ?)', [hostname, liked_count]);
 	
-	connection.query('INSERT INTO blog (hostname, liked_count) VALUES (?, ?)', [hostname, liked_count]);
-	
-	// For each liked post (maximum 20)
-	for(var i=0; i<liked_count && i<20; i++) {
-		writePost(liked_posts[i], hostname);
+			// For each liked post (maximum 20)
+			for(var i=0; i<liked_count && i<20; i++) {
+				writePost(liked_posts[i], hostname);
 	}
-	
+		}
+	});
 }
 
 // Update DB
