@@ -36,10 +36,7 @@ db.createDB();
 function everyhourFunction() {
 	// Code to be executed:
 	
-	// Read the blog list ("blogs.txt");
-	// Track (each hour) all tracks on the list: tracker.trackBlogs();
-	// Store all the obtained data in the DB
-	//file.readPosts();
+	//db.updateAll();
 }
 
 // [If necessary] Removing the running condition:
