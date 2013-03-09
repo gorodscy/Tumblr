@@ -31,7 +31,7 @@ app.listen(port);
 
 var runningFunction = setInterval(everyhourFunction, interval);
 
-db.createDB();
+//db.createDB();
 
 function everyhourFunction() {
 	// Code to be executed:

@@ -2,7 +2,7 @@ db = require('mysql');
 
 // Export the functions to be used in other files.
 // OBS: Other files should evoke require('./fileManager.js'); (if in the same dir)
-module.exports.writePosts = writePosts;
+module.exports.writePost = writePost;
 module.exports.readPosts = readPosts;
 module.exports.saveBlog = saveBlog;
 module.exports.readBlogs = readBlogs;
@@ -24,66 +24,54 @@ function createDB() {
 	connection.query('DROP DATABASE IF EXISTS tumblr'); // It drops database if it already exists
 	connection.query('CREATE DATABASE tumblr'); // Creating a database
 	connection.query('USE tumblr');
-	// Creating blog table in the database tumblr
-	connection.query('CREATE TABLE blog ' +
-		'(id INT(11) AUTO_INCREMENT, ' +
-		' content VARCHAR(255), ' +
-		' PRIMARY KEY(id))'
-	);
-	// Create table post in tumblr DB
+	// Creating post table in the database tumblr
 	connection.query('CREATE TABLE IF NOT EXISTS `post` (' +
-		'`id` int(11) NOT NULL AUTO_INCREMENT,'+
-		'`url` text NOT NULL,'+
-		'`date` date NOT NULL,'+
-		'`image` text,'+
-		'`text` text,'+
-		'`last_track` text NOT NULL,'+
-		'`last_count` text NOT NULL,'+
-		'PRIMARY KEY (`id`)'+
-		') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;'
-	);
+	'`id` int(11) NOT NULL AUTO_INCREMENT,'+
+	'`url` text NOT NULL,'+
+	'`date` date NOT NULL,'+
+	'`image` text NOT NULL,'+
+	'`text` text NOT NULL,'+
+	'`last_track` text NOT NULL,'+
+	'`last_count` text NOT NULL,'+
+	'PRIMARY KEY (`id`)'+ 
+	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
+	// Creating track table in the database tumblr
+	connection.query('CREATE TABLE IF NOT EXISTS `track` ('+
+	'`id` int(11) NOT NULL AUTO_INCREMENT,'+
+	'`timestamp` date NOT NULL,'+
+	'`sequence` int(11) NOT NULL,'+
+	'`increment` int(11) NOT NULL,'+
+	'`count` int(11) NOT NULL,'+
+	'`id_post` int(11),'+
+	'PRIMARY KEY (`id`)'+
+	'FOREIGN KEY (`id_post`) REFERENCES `post` (`id`)'+
+	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
+	// Creating blog table in the database tumblr
+	connection.query('CREATE TABLE IF NOT EXISTS `blog` ('+
+	'`id` int(11) NOT NULL AUTO_INCREMENT,'+
+	'`hostname` text NOT NULL,'+
+	'`like_count` int(11) NOT NULL,'+
+	'`id_post` int(11) NOT NULL,'+
+	'PRIMARY KEY (`id`)'+
+	'FOREIGN KEY (id_post) REFERENCES post (id)'+
+	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
 
+}
+
+function closeDB(){
 	// Finish the connection
 	connection.end();
 }
 
-// Write blog track list
-function saveBlog(blog_list, url){
-	var fs = require('fs');
+// Write blog on DB
+function saveBlog(hostname, liked_count, liked_posts){
 	
-	var blog_count = 0;
+	connection.query('INSERT INTO blog (hostname, liked_count) VALUES (?, ?)', [hostname, liked_count]);
 	
-	if (blog_list != null){
-		var blog_count = blog_list.count;
+	for(var i=0; i<liked_count; i++) {
+		writePost(liked_posts[i]);
 	}
 	
-	var string = '{"count":' + (blog_count+1) + ',';
-	// If first blog
-	if(blog_count == 0){
-	 	string += '"blog":["' + url + '"]}';
-	 }
-	 else {
-	 	for(var i=0; i<=blog_count; i++){
-	 		// If first URL
-			if(i==0){
-				string += '"blog":[' + JSON.stringify(blog_list.blog[i]);
-			}
-			// If last URL
-			else if(i==blog_count){
-				string += ',"' + url + '"]}';
-			}
-			// Otherwise
-			else {
-				string += ',' + JSON.stringify(blog_list.blog[i]);
-			}
-	 	}
-	 }
-	
-	fs.writeFileSync('blogs.txt', string);
-	
-	// Update blog_list:
-	blog_list = JSON.parse(string);
-	return JSON.parse(string);
 }
 
 // Read blog track list
@@ -95,20 +83,28 @@ function readBlogs(){
 	return JSON.parse(j);
 }
 
-// Writing many posts in a file:
-function writePosts(posts){
-	var string = JSON.stringify(posts);
-	var fs = require('fs');
+// Writing post in DB:
+function writePost(post){
 	
 	//get Timestamp
 	var timestamp=new Date();
 	
-	// Insert timestamp
-	//string = timestamp + string;
+	var url = post.post_url;
+	var date = post.date;
+	var last_track = timestamp;
+	var last_count = post.note_count;
 	
-	fs.writeFile('posts.txt', string, function (err) {
-	  	if (err) throw err; 
-	});
+	if(post.type == 'photo') {
+		var image = post.image_permalink;
+		connection.query('INSERT INTO post (url, date, image, last_track, last_count) \
+		VALUES (?, ?)', [url, date, image, last_track, last_count]);
+	}
+	else if(post.type == 'text') {
+		var text = post.body;
+		connection.query('INSERT INTO post (url, date, text, last_track, last_count) \
+		VALUES (?, ?)', [url, date, text, last_track, last_count]);
+	}
+	
 }
 
 // Reading posts from a file:

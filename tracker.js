@@ -3,27 +3,24 @@
 module.exports.trackBlogs = trackBlogs;
 module.exports.postBlog = postBlog;
 
-// List containing all blogs tracked
-var blog_list = null;
-
 function postBlog(req, res){
 	var hostname = req.body.hostname;
 	//console.info("POST received: ", hostname);
-	
-	// Insert the hostname into the URL
-	var url = 'https://api.tumblr.com/v2/blog/' + hostname + '/likes?\
-api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 
-	trackBlog(url, function(s){
+	trackBlog(hostname, function(s){
 		res.send(s);
 	});
 	
 }
 
-function trackBlog(url, cb){
+function trackBlog(hostname, cb){
 	
 	var https = require('https');
-	var file = require('./fileManager.js');
+	var db = require('./dbManager.js');
+	
+	// Insert the hostname into the URL
+	var url = 'https://api.tumblr.com/v2/blog/' + hostname + '/likes?\
+api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 	
 	// do the GET request
 	var get_request = https.get(url, function(res) {
@@ -48,8 +45,8 @@ function trackBlog(url, cb){
 			// Parse the data to JSON Object
 			var j = JSON.parse(data);
 	
-			file.writePosts(j);
-			blog_list = file.saveBlog(blog_list, url);
+			//file.writePosts(j);
+			db.saveBlog(hostname, j.response.liked_count, j.response.liked_posts);
 			//file.readPosts();
 			
 		
