@@ -24,7 +24,7 @@ app.configure(function () {
 // Define POST:
 app.post('/blog', tracker.postBlog);
 // Define GET:
-app.get('/blog/:hostname/trends/:order', trend.trendBlog);
+app.get('/blog/:hostname/trends', trend.trendBlog);
 app.get('/blogs/trends', trend.trendAll);
 
 app.listen(port);
@@ -36,10 +36,7 @@ db.createDB();
 function everyhourFunction() {
 	// Code to be executed:
 	
-	// Read the blog list ("blogs.txt");
-	// Track (each hour) all tracks on the list: tracker.trackBlogs();
-	// Store all the obtained data in the DB
-	//file.readPosts();
+	//db.updateAll();
 }
 
 // [If necessary] Removing the running condition:

@@ -1,12 +1,14 @@
 db = require('mysql');
+tracker = require('./tracker.js');
 
 // Export the functions to be used in other files.
 // OBS: Other files should evoke require('./fileManager.js'); (if in the same dir)
-module.exports.writePosts = writePosts;
-module.exports.readPosts = readPosts;
+module.exports.writePost = writePost;
 module.exports.saveBlog = saveBlog;
-module.exports.readBlogs = readBlogs;
 module.exports.createDB = createDB;
+module.exports.updateAll = updateAll;
+module.exports.getBlog = getBlog;
+module.exports.getAllBlogs = getAllBlogs
 
 // Set up the connection
 var connection = db.createConnection({
@@ -21,131 +23,224 @@ function createDB() {
 	// Establish the connection
 	connection.connect();
 
-	connection.query('DROP DATABASE IF EXISTS tumblr'); // It drops database if it already exists
-	connection.query('CREATE DATABASE tumblr'); // Creating a database
+	connection.query('DROP DATABASE IF EXISTS tumblr');
+	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
 	connection.query('USE tumblr');
 	// Creating blog table in the database tumblr
-	connection.query('CREATE TABLE blog ' +
-		'(id INT(11) AUTO_INCREMENT, ' +
-		' content VARCHAR(255), ' +
-		' PRIMARY KEY(id))'
-	);
-	// Create table post in tumblr DB
+	connection.query('CREATE TABLE IF NOT EXISTS `blog` ('+
+	'`hostname` varchar(250) NOT NULL,'+
+	'`liked_count` int(11) NOT NULL,'+
+	'PRIMARY KEY (`hostname`)'+
+	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
+	// Creating post table in the database tumblr
 	connection.query('CREATE TABLE IF NOT EXISTS `post` (' +
-		'`id` int(11) NOT NULL AUTO_INCREMENT,'+
-		'`url` text NOT NULL,'+
-		'`date` date NOT NULL,'+
-		'`image` text,'+
-		'`text` text,'+
-		'`last_track` text NOT NULL,'+
-		'`last_count` text NOT NULL,'+
-		'PRIMARY KEY (`id`)'+
-		') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;'
-	);
+	'`url` varchar(250) NOT NULL,'+
+	'`date` varchar(250) NOT NULL,'+
+	'`image` text,'+
+	'`text` text,'+
+	'`last_track` text NOT NULL,'+
+	'`last_count` text NOT NULL,'+
+	'`hostname_blog` varchar(250) NOT NULL,'+
+	'PRIMARY KEY (`url`),'+ 
+	'FOREIGN KEY (`hostname_blog`) REFERENCES `blog` (`hostname`)'+
+	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
+	// Creating track table in the database tumblr
+	connection.query('CREATE TABLE IF NOT EXISTS `track` ('+
+	'`id` int(11) NOT NULL AUTO_INCREMENT,'+
+	'`timestamp` text NOT NULL,'+
+	'`sequence` int(11) NOT NULL,'+
+	'`increment` int(11) NOT NULL,'+
+	'`count` int(11) NOT NULL,'+
+	'`url_post` varchar(250) NOT NULL,'+
+	'PRIMARY KEY (`id`),'+
+	'FOREIGN KEY (`url_post`) REFERENCES `post` (`url`)'+
+	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
+	
 
+}
+
+function closeDB(){
 	// Finish the connection
 	connection.end();
 }
 
-// Write blog track list
-function saveBlog(blog_list, url){
-	var fs = require('fs');
+// Write blog on DB
+function saveBlog(hostname, liked_count, liked_posts){
 	
-	var blog_count = 0;
+	// Test if hostname already exists in DB
+	// If not:
 	
-	if (blog_list != null){
-		var blog_count = blog_list.count;
+	connection.query('INSERT INTO blog (hostname, liked_count) VALUES (?, ?)', [hostname, liked_count]);
+	
+	// For each liked post (maximum 20)
+	for(var i=0; i<liked_count && i<20; i++) {
+		writePost(liked_posts[i], hostname);
 	}
 	
-	var string = '{"count":' + (blog_count+1) + ',';
-	// If first blog
-	if(blog_count == 0){
-	 	string += '"blog":["' + url + '"]}';
-	 }
-	 else {
-	 	for(var i=0; i<=blog_count; i++){
-	 		// If first URL
-			if(i==0){
-				string += '"blog":[' + JSON.stringify(blog_list.blog[i]);
-			}
-			// If last URL
-			else if(i==blog_count){
-				string += ',"' + url + '"]}';
-			}
-			// Otherwise
-			else {
-				string += ',' + JSON.stringify(blog_list.blog[i]);
-			}
-	 	}
-	 }
-	
-	fs.writeFileSync('blogs.txt', string);
-	
-	// Update blog_list:
-	blog_list = JSON.parse(string);
-	return JSON.parse(string);
 }
 
-// Read blog track list
-function readBlogs(){
-	var fs = require('fs');
-	var j;
+// Update DB
+function updateAll (){
 	
-	j = fs.readFileSync('blogs.txt');
-	return JSON.parse(j);
-}
-
-// Writing many posts in a file:
-function writePosts(posts){
-	var string = JSON.stringify(posts);
-	var fs = require('fs');
-	
-	//get Timestamp
-	var timestamp=new Date();
-	
-	// Insert timestamp
-	//string = timestamp + string;
-	
-	fs.writeFile('posts.txt', string, function (err) {
-	  	if (err) throw err; 
-	});
-}
-
-// Reading posts from a file:
-function readPosts(){
-	
-	var fs = require('fs');
-	
-	fs.readFile('posts.txt', function (err, data) {
-		if (err) throw err; 
-		var j = JSON.parse(data); 
+	// Select all blogs being tracked
+	connection.query('SELECT * FROM blog', function (err, rows) {
 		
-		var posts = j.response.liked_posts;
-		var liked = j.response.liked_count;
-		// For each post liked by the user (Limited to the last 20 posts)
-		for(var i=0; i<liked && i<20; i++){
-
-			/// Display post information:
-
-			console.info('#-------------------------------------#');
-			console.info('Post #', i, ':');
-
-			console.info('>>	URL: ', posts[i].post_url);
-			console.info('>>	DATE: ', posts[i].date);
-			if(posts[i].type == 'photo') {
-				console.info('>>	PHOTO: ', posts[i].photos);
-			} else if(posts[i].type == 'text') {
-				console.info('>>	TITLE: ', posts[i].title);
-				console.info('>>	TEXT: ', posts[i].body);
-			}
-			console.info('>>	NOTE COUNT (likes): ', posts[i].note_count);
-
-			// If this is the last post
-			if(i == liked-1)
-				console.info('#-------------------------------------#');
+		// For each blog found
+		for(var i=0; i<rows.size(); i++){
 			
-			/// Finish displaying post information
+			tracker.reTrackBlog(rows[i].hostname);
+			
 		}
 		
 	});
+	
 }
+
+// Update a single existing blog
+function updateBlog(hostname, liked_count, liked_posts){
+	
+	connection.query('UPDATE blog SET (liked_count) = (?) WHERE hostname = (?)',
+						[liked_count, hostname]);
+	
+	// For each liked post (maximum 20)
+	for(var i=0; i<liked_count && i<20; i++) {
+		updatePost(liked_posts[i], hostname);
+	}
+	
+}
+
+// Writing post in DB:
+function writePost(post, hostname_blog){
+	//get Timestamp
+	var timestamp=new Date();
+	
+	var url = post.post_url;
+	var date = post.date;
+	var last_track = timestamp;
+	var last_count = post.note_count;
+	
+	if(post.type == 'photo') {
+		var image = post.image_permalink;
+		connection.query('INSERT INTO post (url, date, image, last_track, last_count, hostname_blog) \
+		VALUES (?, ?, ?, ?, ?, ?)', [url, date.toString(), image, last_track, last_count, hostname_blog]);
+	}
+	else if(post.type == 'text') {
+		var text = post.body;
+		connection.query('INSERT INTO post (url, date, text, last_track, last_count, hostname_blog) \
+		VALUES (?, ?, ?, ?, ?, ?)', [url, date.toString(), text, last_track, last_count,  hostname_blog]);
+	}
+	// Write the first track
+	connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
+		VALUES (?, ?, ?, ?, ?)', [timestamp.toString(), 1, 0, post.note_count, url]);
+}
+
+
+// Update post in DB:
+function updatePost(post, hostname_blog){
+	//get Timestamp
+	var timestamp=new Date();
+	
+	// Check if exists
+	
+	// If no: redirect to writePost and return here;
+	
+	// IF yes:
+	
+	var url = post.post_url;
+	var last_track = timestamp;
+	var last_count = post.note_count;
+	
+	connection.query('UPDATE post SET (last_track, last_count) = (?,?) WHERE url = (?)', 
+						[last_track, last_count, url]);
+					
+	// Needs to be calculated based on last track	
+	var sequence;
+	var increment;
+	// Write track
+	connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
+		VALUES (?, ?, ?, ?, ?)', [timestamp.toString(), sequence, increment, post.note_count, url]);
+}
+
+// Retrieve last track of a given post
+function getLastTrack(post){
+	
+	var track;
+	
+	return track;
+	
+}
+
+// Retrieve a list of all tracks given a post
+function getAllTracks(post){
+	
+	var tracks;
+	
+	// Some SELECT;
+	// tracks = rows;
+	
+	return track;
+	
+}
+
+// Retrieve a list of all posts given a blog
+function getAllPosts(blog){
+	
+	var posts
+	
+	// Some SELECT;
+	// posts = rows;
+	
+	return posts;
+	
+}
+
+/// Retrieve a blog given its hostname:
+// HOT TO USE this function:
+//		
+//	db.getBlog(hostname, function(blog){
+//		console.log(blog);
+//	});
+///
+function getBlog(hostname, cb){
+	
+	connection.query('SELECT * FROM blog WHERE (hostname) = (?)', [hostname], function(err, rows){
+		if(err) throw err;
+		
+		if(rows[0] != undefined)
+			cb(rows[0]);
+		
+	});
+	
+}
+
+// Retrieve a list of all blogs
+function getAllBlogs(cb){
+	
+	connection.query('SELECT * FROM blog', function(err, rows){
+		if(err) throw err;
+		
+		if(rows != undefined)
+			cb(rows);
+		
+	});
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
