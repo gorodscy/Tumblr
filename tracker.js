@@ -71,9 +71,6 @@ api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 	// do the GET request
 	var get_request = https.get(url, function(res) {
 		
-		// Callback function to send the statusCode to the POST request
-		cb(res.statusCode);
-		
 		// Create a variable to accumulate data.
 		// It is necessary because the data could be to long.
 		// Otherwise it could only be possible to receive two posts.
@@ -90,7 +87,6 @@ api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 			// Create the JSON only if the hostname is valid.
 			// Parse the data to JSON Object
 			var j = JSON.parse(data);
-	
 			
 			db.updateBlog(hostname, j.response.liked_count, j.response.liked_posts);
 			
