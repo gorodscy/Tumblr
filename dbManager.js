@@ -12,6 +12,7 @@ module.exports.getAllBlogs = getAllBlogs
 module.exports.getAllPosts = getAllPosts
 module.exports.getAllTracks = getAllTracks
 module.exports.getLastTrack = getLastTrack
+module.exports.getPreviousTrack = getPreviousTrack
 
 // Set up the connection
 var connection = db.createConnection({
@@ -165,7 +166,6 @@ function updatePost(post, hostname_blog){
 }
 
 // Retrieve last track of a given post
-/// Retrieve a list of all blogs
 // HOW TO USE this function:
 //
 // db.getAllPosts(hostname, function(posts){
@@ -191,8 +191,33 @@ function getLastTrack(post, cb){
 	
 }
 
+// Retrieve previous track of a given post
+// HOW TO USE this function:
+//
+// db.getAllPosts(hostname, function(posts){
+// 		console.log(posts[0]);
+// 		
+// 		db.getPreviousTrack(posts[0], function(track){
+// 			
+// 			console.log(track);
+// 			
+// 		});
+// 		
+// 	});
+///
+function getPreviousTrack(post, cb){
+	
+	connection.query('SELECT * FROM track WHERE url_post = (?) ORDER BY sequence DESC', [post.url], function(err, rows){
+		if(err) throw err;
+		
+		if(rows[1] != undefined)
+			cb(rows[0]);
+		
+	});
+	
+}
+
 // Retrieve a list of all tracks given a post
-/// Retrieve a list of all blogs
 // HOW TO USE this function:
 //
 // db.getAllPosts(hostname, function(posts){
@@ -219,7 +244,6 @@ function getAllTracks(post, cb){
 }
 
 // Retrieve a list of all posts given a blog
-/// Retrieve a list of all blogs
 // HOW TO USE this function:
 //
 // db.getAllPosts(hostname, function(posts){
