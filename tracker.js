@@ -10,6 +10,7 @@ function postBlog(req, res){
 	var hostname = req.body.hostname;
 	//console.info("POST received: ", hostname);
 	
+	// Insert the hostname into the URL
 	var url = 'https://api.tumblr.com/v2/blog/' + hostname + '/likes?\
 api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 
@@ -20,10 +21,13 @@ function trackBlog(url){
 	
 	var https = require('https');
 	var file = require('./fileManager.js');
+	var status;
 	
 	// do the GET request
 	var get_request = https.get(url, function(res) {
-	
+		
+		status = res.statusCode;
+		
 		// Create a variable to accumulate data.
 		// It is necessary because the data could be to long.
 		// Otherwise it could only be possible to receive two posts.
@@ -36,26 +40,27 @@ function trackBlog(url){
 	
 		// After all data is accumulated
 		res.on('end', function () {
+			
+			// Create the JSON only if the hostname is valid.
+			if(statusCode == 200){
+				// Parse the data to JSON Object
+				var j = JSON.parse(data);
 		
-			// Parse the data to JSON Object
-			var j = JSON.parse(data);
-		
-			file.writePosts(j);
-			blog_list = file.saveBlog(blog_list, url);
-			//file.readPosts();
+				file.writePosts(j);
+				blog_list = file.saveBlog(blog_list, url);
+				//file.readPosts();
+			}
 		
 		});
 
 	});
-	
 	// Catch any errors
 	get_request.end();
 	get_request.on('error', function(e) {
 		console.error(e);
 	});
-	
 	// Return 200 if tumbler user exists. 404 Otherwise.
-	return console.log("statusCode: ", res.statusCode);
+	return status;
 
 }
 
