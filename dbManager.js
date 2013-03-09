@@ -9,6 +9,9 @@ module.exports.createDB = createDB;
 module.exports.updateAll = updateAll;
 module.exports.getBlog = getBlog;
 module.exports.getAllBlogs = getAllBlogs
+module.exports.getAllPosts = getAllPosts
+module.exports.getAllTracks = getAllTracks
+module.exports.getLastTrack = getLastTrack
 
 // Set up the connection
 var connection = db.createConnection({
@@ -162,40 +165,81 @@ function updatePost(post, hostname_blog){
 }
 
 // Retrieve last track of a given post
-function getLastTrack(post){
+/// Retrieve a list of all blogs
+// HOW TO USE this function:
+//
+// db.getAllPosts(hostname, function(posts){
+// 		console.log(posts[0]);
+// 		
+// 		db.getLastTrack(posts[0], function(track){
+// 			
+// 			console.log(track);
+// 			
+// 		});
+// 		
+// 	});
+///
+function getLastTrack(post, cb){
 	
-	var track;
-	
-	return track;
+	connection.query('SELECT * FROM track WHERE url_post = (?) ORDER BY sequence DESC', [post.url], function(err, rows){
+		if(err) throw err;
+		
+		if(rows[0] != undefined)
+			cb(rows[0]);
+		
+	});
 	
 }
 
 // Retrieve a list of all tracks given a post
-function getAllTracks(post){
+/// Retrieve a list of all blogs
+// HOW TO USE this function:
+//
+// db.getAllPosts(hostname, function(posts){
+// 		console.log(posts[0]);
+// 		
+// 		db.getAllTracks(posts[0], function(tracks){
+// 			
+// 			console.log(tracks);
+// 			
+// 		});
+// 		
+// 	});
+///
+function getAllTracks(post, cb){
 	
-	var tracks;
-	
-	// Some SELECT;
-	// tracks = rows;
-	
-	return track;
+	connection.query('SELECT * FROM track WHERE url_post = (?)', [post.url], function(err, rows){
+		if(err) throw err;
+		
+		if(rows != undefined)
+			cb(rows);
+		
+	});
 	
 }
 
 // Retrieve a list of all posts given a blog
-function getAllPosts(blog){
+/// Retrieve a list of all blogs
+// HOW TO USE this function:
+//
+// db.getAllPosts(hostname, function(posts){
+// 		console.log(posts);
+// 	});
+///
+function getAllPosts(hostname, cb){
 	
-	var posts
-	
-	// Some SELECT;
-	// posts = rows;
-	
-	return posts;
+	connection.query('SELECT * FROM post WHERE hostname_blog = (?)', [hostname], function(err, rows){
+		if(err) throw err;
+		
+		if(rows != undefined)
+			cb(rows);
+		
+	});
 	
 }
 
 /// Retrieve a blog given its hostname:
-// HOT TO USE this function:
+// HOW TO USE this function:
 //		
 //	db.getBlog(hostname, function(blog){
 //		console.log(blog);
@@ -213,7 +257,13 @@ function getBlog(hostname, cb){
 	
 }
 
-// Retrieve a list of all blogs
+/// Retrieve a list of all blogs
+// HOW TO USE this function:
+//
+// db.getAllBlogs(function(blogs){
+// 		console.log(blogs);
+// 	});
+///
 function getAllBlogs(cb){
 	
 	connection.query('SELECT * FROM blog', function(err, rows){

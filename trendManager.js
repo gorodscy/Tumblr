@@ -5,22 +5,6 @@ module.exports.trendBlog = trendBlog;
 module.exports.trendAll = trendAll;
 
 
-
-function Trending(hostname, cb){
-	// Get from DB the list of posts ordered 
-	// by the difference of the 2 last tracking
-	cb(resposta-DB);
-
-}
-
-function Recent(hostname){
-	// Get from DB the list of posts ordered 
-	// by the difference of the 2 last tracking
-	cb(resposta-DB);	
-
-}
-
-
 function trendBlog (req, res){
 	var hostname = req.params.hostname;
 	var order = req.params.order;
@@ -32,28 +16,32 @@ function trendBlog (req, res){
 		res.send(404);
 	}
 
-	db.getBlog(hostname, function(blog){
-		console.log(blog);
-		
-		db.getAllPosts(hostname, function(posts) {
-			// Order by the difference of likes
-			if(order == 'Recent'){
-				// Send JSON to the client
-				res.on('data', function(posts){
-					console.log('Sending json back');
-				});				
-			}
-			// Order by the the date of like
-			else {
-				// Send JSON to the client
-				res.on('data', function(posts){
-					console.log('Sending json back');
-				});
-			}
 
-		});
+	db.getAllPosts(blog.hostname, function(posts) {
+		console.log();
+		// EXEMPLO ****
+//***		db.getLastTrack(posts[0], function(track){
+//***			
+//***			console.log(track);
+//***			
+//***		});
+
+		// Order by the difference of likes
+		if(order == 'Recent'){
+			// Send JSON to the client
+			res.on('data', function(posts){
+				console.log('Sending json back');
+			});				
+		}
+		// Order by the the date of like
+		else {
+			// Send JSON to the client
+			res.on('data', function(posts){
+				console.log('Sending json back');
+			});
+		}
 	});
-
+	
 	
 	res.send(200);
 }
