@@ -8,6 +8,7 @@ module.exports.saveBlog = saveBlog;
 module.exports.createDB = createDB;
 module.exports.updateAll = updateAll;
 module.exports.getBlog = getBlog;
+module.exports.getAllBlogs = getAllBlogs
 
 // Set up the connection
 var connection = db.createConnection({
@@ -213,14 +214,15 @@ function getBlog(hostname, cb){
 }
 
 // Retrieve a list of all blogs
-function getAllBlogs(){
+function getAllBlogs(cb){
 	
-	var blogs;
-	
-	// Some SELECT
-	// blogs = rows;
-	
-	return rows;
+	connection.query('SELECT * FROM blog', function(err, rows){
+		if(err) throw err;
+		
+		if(rows != undefined)
+			cb(rows);
+		
+	});
 	
 }
 
