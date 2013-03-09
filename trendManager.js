@@ -25,58 +25,64 @@ function trendBlog (req, res){
 	var hostname = req.params.hostname;
 	var order = req.params.order;
 
-	if(order == 'Trending'){
-		Trending(hostname, function(posts){
-			// Send JSON to the client
-			res.on('data', function(posts){
-				console.log('Sending json back');
-			});		
-		});
-	}
-	else if(order == 'Recent'){
-		Recent(hostname, function(posts){
-			// Send JSON to the client
-			res.on('data', function(posts){
-				console.log('Sending json back');
-			});		
-		});
-	}
-	else {
+	console.log("Retrieve the trends for ", hostname);	
+
+	if(order != 'Trending' | order != 'Recent') {
+		console.log("URL is wrong");
 		res.send(404);
 	}
-	
-	console.log("Must retrieve the trends for ", hostname);
-	
-	db.getBlog(hostname, function(blogs){
+
+	db.getBlog(hostname, function(blog){
 		console.log(blog);
+		
+		db.getAllPosts(hostname, function(posts) {
+			// Order by the difference of likes
+			if(order == 'Recent'){
+				// Send JSON to the client
+				res.on('data', function(posts){
+					console.log('Sending json back');
+				});				
+			}
+			// Order by the the date of like
+			else {
+				// Send JSON to the client
+				res.on('data', function(posts){
+					console.log('Sending json back');
+				});
+			}
+
+		});
 	});
-	
+
 	
 	res.send(200);
 }
 
 function trendAll (req, res){
 	
-	console.log("Must retrieve all trends being tracked");
-	if(order == 'Trending'){
-		// How nany interations
-		for(var i=0; i< blog_list.count; i++){
-			res.on( 'data', function()
-				Trending(hostname);
-				);
-		}
-	}
-	else if(order == 'Recent'){
-		Recent(hostname);
-	}
-	else {
+	console.log("Retrieve all trends being tracked");
+
+	if(order != 'Trending' | order != 'Recent') {
+		console.log("URL is wrong");
 		res.send(404);
 	}
-	
-	
+
 	db.getAllBlogs(function(blogs){
 		console.log(blogs);
+		var i =0;
+		for(var i = 0; blogs[i] != undefined; i++) {
+			db.getAllPosts(blogs[i].hostname, function(posts) {
+				if(order == 'Recent'){
+					// Order by the difference of likes
+					
+				}
+				else {
+					// Order by the the date of like
+					
+				}
+			});
+		}
 	});
-	
+
 	res.send(200);
 }
