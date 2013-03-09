@@ -17,6 +17,9 @@ module.exports.getPreviousTrack = getPreviousTrack
 
 // Set up the connection
 var connection = db.createConnection({
+// host: 'csc309.db.9068705.hostedresource.com',
+// user: 'csc309',
+// password: 'C@nada2013'
 	host: 'localhost',
 	port: 8889,
 	database: "tumblr",
@@ -28,7 +31,10 @@ function createDB(creation_end) {
 	// Establish the connection
 	connection.connect();
 
-	//connection.query('DROP DATABASE IF EXISTS tumblr');
+// 	connection.query('DROP DATABASE IF EXISTS csc309');
+// 	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
+// 	connection.query('USE csc309');
+	connection.query('DROP DATABASE IF EXISTS tumblr');
 	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
 	connection.query('USE tumblr');
 	// Creating blog table in the database tumblr
@@ -76,7 +82,7 @@ function saveBlog(hostname, liked_count, liked_posts){
 	connection.query('SELECT * FROM blog WHERE hostname = "' + hostname + '"', function(err, rows){
 		if(err) throw err;
 		
-		if(rows == undefined){
+		if(rows != undefined){
 			connection.query('INSERT INTO blog (hostname, liked_count) VALUES (?, ?)', [hostname, liked_count]);
 	
 			// For each liked post (maximum 20)
