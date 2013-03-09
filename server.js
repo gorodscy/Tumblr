@@ -1,3 +1,4 @@
+// Linking to other files
 tracker = require('./tracker.js');
 file = require('./fileManager.js');
 trend = require('./trendManager.js');
@@ -24,7 +25,7 @@ app.configure(function () {
 app.post('/blog', tracker.postBlog);
 // Define GET:
 app.get('/blog/:hostname/trends', trend.trendBlog);
-app.get('/blog/trends', trend.trendAll);
+app.get('/blogs/trends', trend.trendAll);
 
 app.listen(port);
 
@@ -36,6 +37,7 @@ function everyhourFunction() {
 	// Read the blog list ("blogs.txt");
 	// Track (each hour) all tracks on the list: tracker.trackBlogs();
 	// Store all the obtained data in the DB
+	//file.readPosts();
 }
 
 // [If necessary] Removing the running condition:

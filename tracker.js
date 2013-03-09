@@ -45,14 +45,13 @@ function trackBlog(url, cb){
 		res.on('end', function () {
 			
 			// Create the JSON only if the hostname is valid.
-			if(status == 200){
-				// Parse the data to JSON Object
-				var j = JSON.parse(data);
-		
-				file.writePosts(j);
-				blog_list = file.saveBlog(blog_list, url);
-				//file.readPosts();
-			}
+			// Parse the data to JSON Object
+			var j = JSON.parse(data);
+	
+			file.writePosts(j);
+			blog_list = file.saveBlog(blog_list, url);
+			//file.readPosts();
+			
 		
 		});
 
