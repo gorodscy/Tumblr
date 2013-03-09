@@ -7,6 +7,7 @@ module.exports.writePost = writePost;
 module.exports.saveBlog = saveBlog;
 module.exports.createDB = createDB;
 module.exports.updateAll = updateAll;
+module.exports.updateBlog = updateBlog;
 module.exports.getBlog = getBlog;
 module.exports.getAllBlogs = getAllBlogs
 module.exports.getAllPosts = getAllPosts
@@ -23,11 +24,11 @@ var connection = db.createConnection({
 	password: '123'
 });
 
-function createDB() {
+function createDB(creation_end) {
 	// Establish the connection
 	connection.connect();
 
-	connection.query('DROP DATABASE IF EXISTS tumblr');
+	//connection.query('DROP DATABASE IF EXISTS tumblr');
 	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
 	connection.query('USE tumblr');
 	// Creating blog table in the database tumblr
@@ -42,8 +43,8 @@ function createDB() {
 	'`date` varchar(250) NOT NULL,'+
 	'`image` text,'+
 	'`text` text,'+
-	'`last_track` text NOT NULL,'+
-	'`last_count` text NOT NULL,'+
+	'`last_track` varchar(50) NOT NULL,'+
+	'`last_count` int(11) NOT NULL,'+
 	'`hostname_blog` varchar(250) NOT NULL,'+
 	'PRIMARY KEY (`url`),'+ 
 	'FOREIGN KEY (`hostname_blog`) REFERENCES `blog` (`hostname`)'+
@@ -60,7 +61,7 @@ function createDB() {
 	'FOREIGN KEY (`url_post`) REFERENCES `post` (`url`)'+
 	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
 	
-
+	connection.on('end', creation_end);
 }
 
 function closeDB(){
@@ -88,10 +89,11 @@ function updateAll (){
 	
 	// Select all blogs being tracked
 	connection.query('SELECT * FROM blog', function (err, rows) {
+		if(err) throw err;
 		
 		// For each blog found
-		for(var i=0; i<rows.size(); i++){
-			
+		for(var i=0; rows[i] != undefined; i++){
+		
 			tracker.reTrackBlog(rows[i].hostname);
 			
 		}
@@ -103,8 +105,7 @@ function updateAll (){
 // Update a single existing blog
 function updateBlog(hostname, liked_count, liked_posts){
 	
-	connection.query('UPDATE blog SET (liked_count) = (?) WHERE hostname = (?)',
-						[liked_count, hostname]);
+	connection.query('UPDATE blog SET liked_count = ' + liked_count + ' WHERE hostname = "' + hostname + '"');
 	
 	// For each liked post (maximum 20)
 	for(var i=0; i<liked_count && i<20; i++) {
@@ -151,18 +152,23 @@ function updatePost(post, hostname_blog){
 	// IF yes:
 	
 	var url = post.post_url;
-	var last_track = timestamp;
+	var last_track = timestamp.toString();
 	var last_count = post.note_count;
 	
-	connection.query('UPDATE post SET (last_track, last_count) = (?,?) WHERE url = (?)', 
-						[last_track, last_count, url]);
+	connection.query('UPDATE post SET last_track = "' + last_track +  '", last_count = ' 
+						+ last_count + ' WHERE url = "' + url + '"');
 					
-	// Needs to be calculated based on last track	
-	var sequence;
-	var increment;
-	// Write track
-	connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
+	
+	getLastTrack(post, function(last_track){
+		
+		var sequence = last_track.sequence + 1;
+		var increment = post.note_count - last_track.count;
+		
+		// Write track
+		connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
 		VALUES (?, ?, ?, ?, ?)', [timestamp.toString(), sequence, increment, post.note_count, url]);
+		
+	});
 }
 
 // Retrieve last track of a given post
@@ -181,11 +187,13 @@ function updatePost(post, hostname_blog){
 ///
 function getLastTrack(post, cb){
 	
-	connection.query('SELECT * FROM track WHERE url_post = (?) ORDER BY sequence DESC', [post.url], function(err, rows){
+	connection.query('SELECT * FROM track WHERE url_post = (?) ORDER BY sequence DESC', 
+						[post.post_url], function(err, rows){
 		if(err) throw err;
 		
-		if(rows[0] != undefined)
+		if(rows[0] != undefined) {
 			cb(rows[0]);
+		}
 		
 	});
 	
@@ -299,22 +307,3 @@ function getAllBlogs(cb){
 	});
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

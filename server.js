@@ -6,11 +6,8 @@ express = require('express');
 
 var port = 31010;
 
-// Lauch the tracker as soon as the server begin
-everyhourFunction();
-
 // Making a function be executed every hour:
-var interval = 3600000; // 1 hour in milliseconds
+var interval = 3000;//3600000; // 1 hour in milliseconds
 
 // Create an express application
 var app = express();
@@ -31,12 +28,15 @@ app.listen(port);
 
 var runningFunction = setInterval(everyhourFunction, interval);
 
-db.createDB();
+db.createDB(function(){
+	// Lauch the tracker as soon as the server begin
+	everyhourFunction();
+});
 
 function everyhourFunction() {
 	// Code to be executed:
 	
-	//db.updateAll();
+	db.updateAll();
 }
 
 // [If necessary] Removing the running condition:
