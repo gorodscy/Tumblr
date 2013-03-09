@@ -16,47 +16,49 @@ var connection = db.createConnection({
 	password: '123'
 });
 
-function createDB()
-// Establish the connection
-connection.connect();
+function createDB() {
+	// Establish the connection
+	connection.connect();
 
-connection.query('DROP DATABASE IF EXISTS tumblr'); // It drops database if it already exists
-connection.query('CREATE DATABASE tumblr'); // Creating a database
-connection.query('USE tumblr');
-// Creating a table in the database node
-connection.query('CREATE TABLE blog ' +
-	'(id INT(11) AUTO_INCREMENT, ' +
-	' content VARCHAR(255), ' +
-	' PRIMARY KEY(id))'
-);
-// Inserting data in the database
-connection.query('INSERT INTO blog (content) VALUES (?)', ['Ystallonne Alves']);
-connection.query('INSERT INTO blog (content) VALUES (?)', ['Alves Ystallonne']);
-// Updating data in the database
-connection.query('UPDATE blog SET content = ? WHERE id = ?', ['Ystallonne Carlos', 1], function(err, info) {
-	if (err) throw err;
-	console.log('Changed content of ' + info.affectedRows + ' rows');
-});
-// Selecting data from database
-connection.query('SELECT * FROM blog', function (err, rows) {
-	if (err) throw err;
-	databaseObject = rows;
-	console.log(rows);
-	console.log(rows[0].id);	
-});
-// Deleting data from database
-connection.query('DELETE FROM blog Where id = ?', [1], function (err, info) {
-	if (err) throw err;
-	console.log('Changed content of ' + info.affectedRows + ' rows');
-});
-// Selecting data from database
-connection.query('SELECT * FROM blog', function (err, rows) {
-	if (err) throw err;
-	console.log(rows);
-});
+	connection.query('DROP DATABASE IF EXISTS tumblr'); // It drops database if it already exists
+	connection.query('CREATE DATABASE tumblr'); // Creating a database
+	connection.query('USE tumblr');
+	// Creating a table in the database node
+	connection.query('CREATE TABLE blog ' +
+		'(id INT(11) AUTO_INCREMENT, ' +
+		' content VARCHAR(255), ' +
+		' PRIMARY KEY(id))'
+	);
+	// Inserting data in the database
+	connection.query('INSERT INTO blog (content) VALUES (?)', ['Ystallonne Alves']);
+	connection.query('INSERT INTO blog (content) VALUES (?)', ['Alves Ystallonne']);
+	// Updating data in the database
+	connection.query('UPDATE blog SET content = ? WHERE id = ?', ['Ystallonne Carlos', 1], function(err, info) {
+		if (err) throw err;
+		console.log('Changed content of ' + info.affectedRows + ' rows');
+	});
+	// Selecting data from database
+	connection.query('SELECT * FROM blog', function (err, rows) {
+		if (err) throw err;
+		databaseObject = rows;
+		console.log(rows);
+		console.log(rows[0].id);	
+	});
+	// Deleting data from database
+	connection.query('DELETE FROM blog Where id = ?', [1], function (err, info) {
+		if (err) throw err;
+		console.log('Changed content of ' + info.affectedRows + ' rows');
+	});
+	// Selecting data from database
+	connection.query('SELECT * FROM blog', function (err, rows) {
+		if (err) throw err;
+		console.log(rows);
+	});
 
-// Finish the connection
-connection.end();
+	// Finish the connection
+	connection.end();
+}
+
 
 // Write blog track list
 function saveBlog(blog_list, url){
