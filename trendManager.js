@@ -1,3 +1,6 @@
+// Linking to other files
+db = require('./dbManager.js');
+
 module.exports.trendBlog = trendBlog;
 module.exports.trendAll = trendAll;
 
@@ -5,6 +8,11 @@ function trendBlog (req, res){
 	var hostname = req.params.hostname;
 	
 	console.log("Must retrieve the trends for ", hostname);
+	
+	db.getBlog(hostname, function(blog){
+		console.log(blog);
+	});
+	
 	
 	res.send(200);
 }

@@ -7,6 +7,7 @@ module.exports.writePost = writePost;
 module.exports.saveBlog = saveBlog;
 module.exports.createDB = createDB;
 module.exports.updateAll = updateAll;
+module.exports.getBlog = getBlog;
 
 // Set up the connection
 var connection = db.createConnection({
@@ -192,10 +193,22 @@ function getAllPosts(blog){
 	
 }
 
-// Retrieve a blog given its hostname
-function getBlog(hostname){
+/// Retrieve a blog given its hostname:
+// HOT TO USE this function:
+//		
+//	db.getBlog(hostname, function(blog){
+//		console.log(blog);
+//	});
+///
+function getBlog(hostname, cb){
 	
-	
+	connection.query('SELECT * FROM blog WHERE (hostname) = (?)', [hostname], function(err, rows){
+		if(err) throw err;
+		
+		if(rows[0] != undefined)
+			cb(rows[0]);
+		
+	});
 	
 }
 
