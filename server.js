@@ -2,7 +2,6 @@ tracker = require('./tracker.js');
 file = require('./fileManager.js');
 trend = require('./trendManager.js');
 express = require('express');
-db = require('mysql');
 
 var port = 31010;
 

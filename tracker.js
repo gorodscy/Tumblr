@@ -13,7 +13,7 @@ function postBlog(req, res){
 	var url = 'https://api.tumblr.com/v2/blog/' + hostname + '/likes?\
 api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 
-	trackBlog(url);
+	res.send(trackBlog(url));
 }
 
 function trackBlog(url){
@@ -23,10 +23,6 @@ function trackBlog(url){
 	
 	// do the GET request
 	var get_request = https.get(url, function(res) {
-
-		//Uncomment for DEBUG:
-		//console.log("statusCode: ", res.statusCode);
-		//console.log("headers: ", res.headers);
 	
 		// Create a variable to accumulate data.
 		// It is necessary because the data could be to long.
@@ -57,6 +53,9 @@ function trackBlog(url){
 	get_request.on('error', function(e) {
 		console.error(e);
 	});
+	
+	// Return 200 if tumbler user exists. 404 Otherwise.
+	return console.log("statusCode: ", res.statusCode);
 
 }
 

@@ -1,9 +1,32 @@
+db = require('mysql');
+
 // Export the functions to be used in other files.
 // OBS: Other files should evoke require('./fileManager.js'); (if in the same dir)
 module.exports.writePosts = writePosts;
 module.exports.readPosts = readPosts;
 module.exports.saveBlog = saveBlog;
 module.exports.readBlogs = readBlogs;
+
+// Set up the connection
+var connection = db.createConnection({
+	host: 'localhost',
+	port: 8889,
+	database: "tumblr",
+	user: 'gorodscy',
+	password: '123'
+});
+
+// Establish the connection
+connection.connect();
+
+connection.query('SELECT * FROM Blogs', function(err, rows, fields) {
+  if (err) throw err;
+
+  console.log('The solution is: ', rows[0].ID);
+});
+
+// Finish the connection
+connection.end();
 
 // Write blog track list
 function saveBlog(blog_list, url){
