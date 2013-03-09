@@ -1,6 +1,6 @@
 // Linking to other files
 tracker = require('./tracker.js');
-file = require('./fileManager.js');
+db = require('./dbManager.js');
 trend = require('./trendManager.js');
 express = require('express');
 
@@ -30,6 +30,8 @@ app.get('/blogs/trends', trend.trendAll);
 app.listen(port);
 
 var runningFunction = setInterval(everyhourFunction, interval);
+
+db.createDB();
 
 function everyhourFunction() {
 	// Code to be executed:
