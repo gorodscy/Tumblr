@@ -9,10 +9,20 @@ function trendBlog (req, res){
 	
 	console.log("Must retrieve the trends for ", hostname);
 	
-	db.getBlog(hostname, function(blogs){
+	db.getBlog(hostname, function(blog){
 		console.log(blog);
 	});
 	
+	db.getAllPosts(hostname, function(posts){
+		console.log(posts[0]);
+		
+		db.getLastTrack(posts[0], function(track){
+			
+			console.log(track);
+			
+		});
+		
+	});
 	
 	res.send(200);
 }
