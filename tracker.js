@@ -1,6 +1,20 @@
 // Export the function trackBlog to be used in other files.
 // OBS: Other files should evoke require('./tracker.js'); (if in the same dir)
 module.exports.trackBlogs = trackBlogs;
+module.exports.postBlog = postBlog;
+
+// List containing all blogs tracked
+var blog_list = null;
+
+function postBlog(req, res){
+	var hostname = req.body.hostname;
+	//console.info("POST received: ", hostname);
+	
+	var url = 'https://api.tumblr.com/v2/blog/' + hostname + '/likes?\
+api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
+
+	trackBlog(url);
+}
 
 function trackBlog(url){
 	
@@ -31,6 +45,7 @@ function trackBlog(url){
 			var j = JSON.parse(data);
 		
 			file.writePosts(j);
+			blog_list = file.saveBlog(blog_list, url);
 			//file.readPosts();
 		
 		});

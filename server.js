@@ -1,6 +1,10 @@
 tracker = require('./tracker.js');
 file = require('./fileManager.js');
-https = require('https');
+trend = require('./trendManager.js');
+express = require('express');
+db = require('mongodb');
+
+var port = 31010;
 
 // Lauch the tracker as soon as the server begin
 everyhourFunction();
@@ -8,24 +12,31 @@ everyhourFunction();
 // Making a function be executed every hour:
 var interval = 3600000; // 1 hour in milliseconds
 
+// Create an express application
+var app = express();
+
+// Configuring the app
+app.configure(function () {
+	app.use(express.bodyParser());
+});
+
+/// Define the REST API:
+// Define POST:
+app.post('/blog', tracker.postBlog);
+// Define GET:
+app.get('/blog/:hostname/trends', trend.trendBlog);
+app.get('/blog/trends', trend.trendAll);
+
+app.listen(port);
+
 var runningFunction = setInterval(everyhourFunction, interval);
 
 function everyhourFunction() {
 	// Code to be executed:
-
-	var blog_list = null;
-
-  	blog_list = file.saveBlog(blog_list, 'https://api.tumblr.com/v2/blog/gorodscy.tumblr.com/likes?\
-api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
-	blog_list = file.saveBlog(blog_list, 'https://api.tumblr.com/v2/blog/ystallonne.tumblr.com/likes?\
-api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
-	blog_list = file.saveBlog(blog_list, 'https://api.tumblr.com/v2/blog/wakkuu.tumblr.com/likes?\
-api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp');
-
-  
- 	 blog_list = file.readBlogs();
- 	 
- 	 tracker.trackBlogs(blog_list);
+	
+	// Read the blog list ("blogs.txt");
+	// Track (each hour) all tracks on the list: tracker.trackBlogs();
+	// Store all the obtained data in the DB
 }
 
 // [If necessary] Removing the running condition:
