@@ -16,12 +16,13 @@ var connection = db.createConnection({
 	password: '123'
 });
 
+function createDB()
 // Establish the connection
 connection.connect();
 
-connection.query('DROP DATABASE IF EXISTS node'); // It drops database if it already exists
-connection.query('CREATE DATABASE node'); // Creating a database
-connection.query('USE node');
+connection.query('DROP DATABASE IF EXISTS tumblr'); // It drops database if it already exists
+connection.query('CREATE DATABASE tumblr'); // Creating a database
+connection.query('USE tumblr');
 // Creating a table in the database node
 connection.query('CREATE TABLE blog ' +
 	'(id INT(11) AUTO_INCREMENT, ' +
