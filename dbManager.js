@@ -20,11 +20,14 @@ var connection = db.createConnection({
 // host: 'csc309.db.9068705.hostedresource.com',
 // user: 'csc309',
 // password: 'C@nada2013'
-	host: 'localhost',
-	port: 8889,
-	database: "tumblr",
-	user: 'gorodscy',
-	password: '123'
+//	host: 'localhost',
+//	port: 8889,
+//	database: "tumblr",
+//	user: 'gorodscy',
+//	password: '123'
+host: 'localhost',
+user: 'c3curygo',
+password: 'c89de916'
 });
 
 function createDB(creation_end) {
@@ -34,9 +37,12 @@ function createDB(creation_end) {
 // 	connection.query('DROP DATABASE IF EXISTS csc309');
 // 	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
 // 	connection.query('USE csc309');
-	connection.query('DROP DATABASE IF EXISTS tumblr');
-	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
-	connection.query('USE tumblr');
+//	connection.query('DROP DATABASE IF EXISTS tumblr');
+//	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
+//	connection.query('USE tumblr');
+	connection.query('DROP DATABASE IF EXISTS csc309h_c3curygo');
+	connection.query('CREATE DATABASE IF NOT EXISTS csc309h_c3curygo'); // Creating a database
+	connection.query('USE csc309h_c3curygo');
 	// Creating blog table in the database tumblr
 	connection.query('CREATE TABLE IF NOT EXISTS `blog` ('+
 	'`hostname` varchar(250) NOT NULL,'+
