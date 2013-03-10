@@ -20,14 +20,14 @@ var connection = db.createConnection({
 // host: 'csc309.db.9068705.hostedresource.com',
 // user: 'csc309',
 // password: 'C@nada2013'
-//	host: 'localhost',
-//	port: 8889,
-//	database: "tumblr",
-//	user: 'gorodscy',
-//	password: '123'
-host: 'localhost',
-user: 'c3curygo',
-password: 'c89de916'
+	host: 'localhost',
+	port: 8889,
+	database: "tumblr",
+	user: 'gorodscy',
+	password: '123'
+// host: 'localhost',
+// user: 'c3curygo',
+// password: 'c89de916'
 });
 
 function createDB(creation_end) {
@@ -37,12 +37,12 @@ function createDB(creation_end) {
 // 	connection.query('DROP DATABASE IF EXISTS csc309');
 // 	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
 // 	connection.query('USE csc309');
-//	connection.query('DROP DATABASE IF EXISTS tumblr');
-//	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
-//	connection.query('USE tumblr');
-	connection.query('DROP DATABASE IF EXISTS csc309h_c3curygo');
-	connection.query('CREATE DATABASE IF NOT EXISTS csc309h_c3curygo'); // Creating a database
-	connection.query('USE csc309h_c3curygo');
+	connection.query('DROP DATABASE IF EXISTS tumblr');
+	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
+	connection.query('USE tumblr');
+// 	connection.query('DROP DATABASE IF EXISTS csc309h_c3curygo');
+// 	connection.query('CREATE DATABASE IF NOT EXISTS csc309h_c3curygo'); // Creating a database
+// 	connection.query('USE csc309h_c3curygo');
 	// Creating blog table in the database tumblr
 	connection.query('CREATE TABLE IF NOT EXISTS `blog` ('+
 	'`hostname` varchar(250) NOT NULL,'+
@@ -88,13 +88,14 @@ function saveBlog(hostname, liked_count, liked_posts){
 	connection.query('SELECT * FROM blog WHERE hostname = "' + hostname + '"', function(err, rows){
 		if(err) throw err;
 		
-		if(rows != undefined){
+		if(rows[0] == undefined){
 			connection.query('INSERT INTO blog (hostname, liked_count) VALUES (?, ?)', [hostname, liked_count]);
 	
 			// For each liked post (maximum 20)
 			for(var i=0; i<liked_count && i<20; i++) {
 				writePost(liked_posts[i], hostname);
-	}
+				
+			}
 		}
 	});
 }
