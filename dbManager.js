@@ -94,7 +94,6 @@ function saveBlog(hostname, liked_count, liked_posts){
 			// For each liked post (maximum 20)
 			for(var i=0; i<liked_count && i<20; i++) {
 				writePost(liked_posts[i], hostname);
-				
 			}
 		}
 	});
@@ -140,19 +139,22 @@ function writePost(post, hostname_blog){
 	var last_track = timestamp;
 	var last_count = post.note_count;
 	
+	
 	if(post.type == 'photo') {
 		var image = post.image_permalink;
 		connection.query('INSERT INTO post (url, date, image, last_track, last_count, hostname_blog) \
 		VALUES (?, ?, ?, ?, ?, ?)', [url, date.toString(), image, last_track, last_count, hostname_blog]);
 	}
-	else if(post.type == 'text') {
+	else {
 		var text = post.body;
 		connection.query('INSERT INTO post (url, date, text, last_track, last_count, hostname_blog) \
-		VALUES (?, ?, ?, ?, ?, ?)', [url, date.toString(), text, last_track, last_count,  hostname_blog]);
+		VALUES (?, ?, ?, ?, ?, ?)', [url, date.toString(), text, last_track, last_count, hostname_blog]);
 	}
+	
 	// Write the first track
 	connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
 		VALUES (?, ?, ?, ?, ?)', [timestamp, 1, 0, post.note_count, url]);
+		
 }
 
 

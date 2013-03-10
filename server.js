@@ -37,6 +37,7 @@ function everyhourFunction() {
 	// Code to be executed:
 	
 	db.updateAll();
+	
 }
 
 // [If necessary] Removing the running condition:
