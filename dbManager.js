@@ -14,6 +14,7 @@ module.exports.getAllPosts = getAllPosts
 module.exports.getAllTracks = getAllTracks
 module.exports.getLastTrack = getLastTrack
 module.exports.getPreviousTrack = getPreviousTrack
+module.exports.getPostbyPopularity = getPostbyPopularity;
 
 // Set up the connection
 var connection = db.createConnection({
@@ -259,7 +260,8 @@ function getPreviousTrack(post, cb){
 ///
 function getAllTracks(post, cb){
 	
-	connection.query('SELECT * FROM track WHERE url_post = (?)', [post.url], function(err, rows){
+	connection.query('SELECT track.timestamp, track.sequence, track.increment, track.count\
+						 FROM track WHERE url_post = (?)', [post.url], function(err, rows){
 		if(err) throw err;
 		
 		if(rows != undefined)
@@ -325,6 +327,44 @@ function getAllBlogs(cb){
 	});
 	
 }
+
+function getPostbyPopularity(cb){
+	var str = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count\
+	FROM post\
+	INNER JOIN track\
+	ON post.url = track.url_post\
+	WHERE track.sequence = (SELECT MAX(sequence) FROM track WHERE track.url_post = post.url)\
+	ORDER BY track.increment DESC';
+	
+	
+	var posts = JSON.parse('{}');
+	
+	var trending = '';
+	
+	connection.query(str, function(err, rows){
+		if(err) throw err;
+		
+		if(rows != undefined) {
+			
+			for(var i=0; rows[i] != undefined; i++){
+				
+				var post = rows[i];
+				
+				getAllTracks(rows[i], function(tracks){
+					post.tracking = tracks;
+					
+				    trending += JSON.stringify(post);
+				});
+			}
+			console.log("trending fora:", trending);
+			post.trending = trending;
+			cb(posts);
+		}
+	});
+	
+}
+
+
 
 function displayTime() {
 	var str = "";
