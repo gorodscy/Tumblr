@@ -133,7 +133,7 @@ function updateBlog(hostname, liked_count, liked_posts){
 // Writing post in DB:
 function writePost(post, hostname_blog){
 	//get Timestamp
-	var timestamp=new Date();
+	var timestamp=displayTime();
 	
 	var url = post.post_url;
 	var date = post.date;
@@ -152,14 +152,14 @@ function writePost(post, hostname_blog){
 	}
 	// Write the first track
 	connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
-		VALUES (?, ?, ?, ?, ?)', [timestamp.toString(), 1, 0, post.note_count, url]);
+		VALUES (?, ?, ?, ?, ?)', [timestamp, 1, 0, post.note_count, url]);
 }
 
 
 // Update post in DB:
 function updatePost(post, hostname_blog){
 	//get Timestamp
-	var timestamp=new Date();
+	var timestamp=displayTime();
 	
 	// Check if exists
 	
@@ -168,7 +168,7 @@ function updatePost(post, hostname_blog){
 	// IF yes:
 	
 	var url = post.post_url;
-	var last_track = timestamp.toString();
+	var last_track = timestamp;
 	var last_count = post.note_count;
 	
 	connection.query('UPDATE post SET last_track = "' + last_track +  '", last_count = ' 
@@ -182,7 +182,7 @@ function updatePost(post, hostname_blog){
 		
 		// Write track
 		connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
-		VALUES (?, ?, ?, ?, ?)', [timestamp.toString(), sequence, increment, post.note_count, url]);
+		VALUES (?, ?, ?, ?, ?)', [timestamp, sequence, increment, post.note_count, url]);
 		
 	});
 }
@@ -322,4 +322,41 @@ function getAllBlogs(cb){
 		
 	});
 	
+}
+
+function displayTime() {
+	var str = "";
+	var currentTime = new Date();
+
+	var year = currentTime.getFullYear();
+	var month = (currentTime.getMonth() + 1);
+	var day = currentTime.getDate();
+	var hours = currentTime.getHours();
+	var minutes = currentTime.getMinutes();
+	var seconds = currentTime.getSeconds();
+	if (month < 10) {
+		month = "0" + month;
+	}
+
+	if (day < 10) {
+		day = "0" + day;
+	}
+
+	if (minutes < 10) {
+		minutes = "0" + minutes
+	}
+
+	if (seconds < 10) {
+		seconds = "0" + seconds
+	}
+
+	str += year + "-" + month + "-" + day + ' ' + hours + ":" + minutes + ":" + seconds + " ";
+
+	if(hours > 11){
+		str += "PM"
+	} else {
+		str += "AM"
+	}
+
+	return str;
 }
