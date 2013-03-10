@@ -6,7 +6,7 @@ module.exports.trendAll = trendAll;
 
 
 function trendBlog (req, res){
-	
+
 }
 
 function trendAll (req, res){
