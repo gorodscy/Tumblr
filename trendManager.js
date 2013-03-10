@@ -23,15 +23,16 @@ function trendBlog (req, res){
 
 		// Order by the the date of like
 		if(order == 'Recent'){
+			for(var i = 0; posts[i] != undefined ; i++) {
+				db.getAllTracks(posts[i], function(tracks){
+					posts[i].tracks = tracks;
+				});				
+			}
 			
-			db.getPreviousTrack(post[i], function(track) { 
-				
-			});
-
+			postText = JSON.stringify(posts);
+			console.log(posts);
 			// Send JSON to the client
-			res.on('data', function(posts){
-				console.log('Sending json back');
-			});				
+			res.send(postText);		
 		}
 		// Order by the difference of likes
 		else {
@@ -43,7 +44,7 @@ function trendBlog (req, res){
 	});
 	
 	
-	res.send(200);
+	res.send(404);
 }
 
 function trendAll (req, res){
