@@ -265,7 +265,7 @@ function getAllTracks(post, cb){
 		if(err) throw err;
 		
 		if(rows != undefined) {
-			cb(rows);
+			cb(rows, post);
 		}
 		
 	});
@@ -342,6 +342,8 @@ function getAllBlogs(cb){
 
 function getPostbyPopularity(limit, cb){
 	
+	
+	
 	// Retrieve All posts ordered by popularity
 	var query = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count\
 	FROM post\
@@ -349,26 +351,26 @@ function getPostbyPopularity(limit, cb){
 	ON post.url = track.url_post\
 	WHERE track.sequence = (SELECT MAX(sequence) FROM track WHERE track.url_post = post.url)\
 	ORDER BY track.increment DESC';
-	
+
 	
 	connection.query(query, function(err, rows){
 		if(err) throw err;
 		
 		if(rows != undefined) {
 			
-			var allPosts = JSON.parse('{"trending":[]}');
-			
 			// For each post
 			for(var i=0; rows[i] != undefined && i<limit; i++){
 				
 				var post = rows[i];
-				getAllTracks(post, function(tracks){
+				
+				//console.log('aqui eh um post diferente antes ', post);
+				getAllTracks(post, function(tracks, posts){
 					
-					post.tracking = tracks;
+					posts.tracking = tracks;
 					
-					cb(post, i, rows.length);
-					
+					cb(posts, i, rows.length);
 				});
+				
 				
 			}
 		}
