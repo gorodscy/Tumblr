@@ -264,8 +264,9 @@ function getAllTracks(post, cb){
 						 FROM track WHERE url_post = (?)', [post.url], function(err, rows){
 		if(err) throw err;
 		
-		if(rows != undefined)
+		if(rows != undefined) {
 			cb(rows);
+		}
 		
 	});
 	
@@ -328,8 +329,8 @@ function getAllBlogs(cb){
 	
 }
 
-function getPostbyPopularity(cb){
-	var str = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count\
+function getPostbyPopularity(limit, cb){
+	var query = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count\
 	FROM post\
 	INNER JOIN track\
 	ON post.url = track.url_post\
@@ -337,28 +338,30 @@ function getPostbyPopularity(cb){
 	ORDER BY track.increment DESC';
 	
 	
-	var posts = JSON.parse('{}');
-	
-	var trending = '';
-	
-	connection.query(str, function(err, rows){
+	connection.query(query, function(err, rows){
 		if(err) throw err;
 		
 		if(rows != undefined) {
 			
+			var getByPop = JSON.parse('{"trending":[]}');
+			var trending = '';
+			
+			// For each post
 			for(var i=0; rows[i] != undefined; i++){
 				
 				var post = rows[i];
 				
-				getAllTracks(rows[i], function(tracks){
+				getAllTracks(post, function(tracks){
+					
 					post.tracking = tracks;
 					
-				    trending += JSON.stringify(post);
 				});
+				
+				getByPop.trending[i] = post;
+				
 			}
-			console.log("trending fora:", trending);
-			post.trending = trending;
-			cb(posts);
+			
+			cb(getByPop);
 		}
 	});
 	
