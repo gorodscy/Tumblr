@@ -5,7 +5,7 @@ module.exports.postBlog = postBlog;
 module.exports.reTrackBlog = reTrackBlog;
 
 function postBlog(req, res){
-	var hostname = req.body.hostname;
+	var hostname = req.body.blog;
 	//console.info("POST received: ", hostname);
 
 	trackBlog(hostname, function(s){

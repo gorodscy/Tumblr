@@ -21,7 +21,8 @@ app.configure(function () {
 // Define POST:
 app.post('/blog', tracker.postBlog);
 // Define GET:
-app.get('/blog/:hostname/trends', trend.trendBlog);
+app.get('/blog/:hostname/trends/:order/:limit', trend.trendBlog);
+app.get('/blog/:hostname/trends/:order', trend.trendBlog);
 app.get('/blogs/trends/:order/:limit', trend.trendAll);
 app.get('/blogs/trends/:order', trend.trendAll);
 
