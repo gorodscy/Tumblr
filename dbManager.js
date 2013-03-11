@@ -16,20 +16,22 @@ module.exports.getLastTrack = getLastTrack
 module.exports.getPreviousTrack = getPreviousTrack
 module.exports.getPostbyPopularity = getPostbyPopularity;
 module.exports.getPostRecent = getPostRecent;
+module.exports.getBlogPostRecent = getBlogPostRecent;
+module.exports.getBlogPostbyPopularity = getBlogPostbyPopularity;
 
 // Set up the connection
 var connection = db.createConnection({
-// host: 'csc309.db.9068705.hostedresource.com',
-// user: 'csc309',
-// password: 'C@nada2013'
-	host: 'localhost',
-	port: 8889,
-	database: "tumblr",
-	user: 'gorodscy',
-	password: '123'
-// host: 'localhost',
-// user: 'c3curygo',
-// password: 'c89de916'
+	host: 'csc309.db.9068705.hostedresource.com',
+	user: 'csc309',
+	password: 'C@nada2013'
+// 	host: 'localhost',
+// 	port: 8889,
+// 	database: "tumblr",
+// 	user: 'gorodscy',
+// 	password: '123'
+// 	host: 'localhost',
+// 	user: 'c3curygo',
+// 	password: 'c89de916'
 });
 
 
@@ -41,11 +43,11 @@ function createDB(creation_end) {
 	connection.query('SET SESSION wait_timeout = 1000000000');
 
 // 	connection.query('DROP DATABASE IF EXISTS csc309');
-// 	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
-// 	connection.query('USE csc309');
-	connection.query('DROP DATABASE IF EXISTS tumblr');
-	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
-	connection.query('USE tumblr');
+	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
+	connection.query('USE csc309');
+// 	connection.query('DROP DATABASE IF EXISTS tumblr');
+// 	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
+// 	connection.query('USE tumblr');
 // 	connection.query('DROP DATABASE IF EXISTS csc309h_c3curygo');
 // 	connection.query('CREATE DATABASE IF NOT EXISTS csc309h_c3curygo'); // Creating a database
 // 	connection.query('USE csc309h_c3curygo');
@@ -337,13 +339,14 @@ function getPostbyPopularity(limit, cb){
 	INNER JOIN track\
 	ON post.url = track.url_post\
 	WHERE track.sequence = (SELECT MAX(sequence) FROM track WHERE track.url_post = post.url)\
-	ORDER BY track.increment DESC';
+	ORDER BY track.increment DESC LIMIT 0, ' + limit;
 
 	
 	connection.query(query, function(err, rows){
 		if(err) throw err;
 		
-		if(rows != undefined) {
+		// If has any results
+		if(rows[0] != undefined) {
 			
 			// For each post
 			for(var i=0; rows[i] != undefined && i<limit; i++){
@@ -357,6 +360,10 @@ function getPostbyPopularity(limit, cb){
 				
 				
 			}
+		}
+		// If not find
+		else {
+			cb(404, 1);
 		}
 	});
 	
@@ -372,13 +379,14 @@ function getPostRecent(limit, cb){
 				SELECT MIN( sequence ) \
 				FROM track \
 				WHERE track.url_post = post.url ) \
-				ORDER BY post.date DESC';
+				ORDER BY post.date DESC LIMIT 0, ' + limit;
 
 	
 	connection.query(query, function(err, rows){
 		if(err) throw err;
 		
-		if(rows != undefined) {
+		// If has any results
+		if(rows[0] != undefined) {
 			
 			// For each post
 			for(var i=0; rows[i] != undefined && i<limit; i++){
@@ -393,27 +401,70 @@ function getPostRecent(limit, cb){
 				
 			}
 		}
+		// If not find
+		else {
+			cb(404, 1);
+		}
 	});
 	
 }
 
-function getBlogPostRecent(limit, cb){
+function getBlogPostRecent(hostname, limit, cb){
 	
 	// Retrieve All posts ordered by popularity
 	var query = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count \
 				FROM post \
-				INNER JOIN track ON post.url = track.url_post \
+				INNER JOIN track \
+				ON (post.url = track.url_post AND post.hostname_blog = "' + hostname + '") \
 				WHERE track.sequence = ( \
 				SELECT MIN( sequence ) \
 				FROM track \
 				WHERE track.url_post = post.url ) \
-				ORDER BY post.date DESC';
+				ORDER BY post.date DESC LIMIT 0, ' + limit;
 
 	
 	connection.query(query, function(err, rows){
 		if(err) throw err;
 		
-		if(rows != undefined) {
+		// If has any results
+		if(rows[0] != undefined) {
+			// For each post
+			for(var i=0; rows[i] != undefined; i++){
+				
+				getAllTracks(rows[i], function(tracks, post){
+					
+					post.tracking = tracks;
+					
+					cb(post, rows.length);
+				});
+				
+				
+			}
+		}
+		// If not find
+		else {
+			cb(404, 1);
+		}
+	});
+	
+}
+
+function getBlogPostbyPopularity(hostname, limit, cb){
+	
+	// Retrieve All posts ordered by popularity
+	var query = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count \
+	FROM post \
+	INNER JOIN track \
+	ON (post.url = track.url_post AND post.hostname_blog = "' + hostname + '") \
+	WHERE track.sequence = (SELECT MAX(sequence) FROM track WHERE track.url_post = post.url) \
+	ORDER BY track.increment DESC LIMIT 0, ' + limit;
+
+	
+	connection.query(query, function(err, rows){
+		if(err) throw err;
+		
+		// If has any results
+		if(rows[0] != undefined) {
 			
 			// For each post
 			for(var i=0; rows[i] != undefined && i<limit; i++){
@@ -428,38 +479,9 @@ function getBlogPostRecent(limit, cb){
 				
 			}
 		}
-	});
-	
-}
-
-function getBlogbyPopularity(limit, cb){
-	
-	// Retrieve All posts ordered by popularity
-	var query = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count\
-	FROM post\
-	INNER JOIN track\
-	ON post.url = track.url_post\
-	WHERE track.sequence = (SELECT MAX(sequence) FROM track WHERE track.url_post = post.url)\
-	ORDER BY track.increment DESC';
-
-	
-	connection.query(query, function(err, rows){
-		if(err) throw err;
-		
-		if(rows != undefined) {
-			
-			// For each post
-			for(var i=0; rows[i] != undefined && i<limit; i++){
-				
-				getAllTracks(rows[i], function(tracks, post){
-					
-					post.tracking = tracks;
-					
-					cb(post, rows.length);
-				});
-				
-				
-			}
+		// If not find
+		else {
+			cb(404, 1);
 		}
 	});
 	
