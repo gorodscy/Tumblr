@@ -15,6 +15,7 @@ module.exports.getAllTracks = getAllTracks
 module.exports.getLastTrack = getLastTrack
 module.exports.getPreviousTrack = getPreviousTrack
 module.exports.getPostbyPopularity = getPostbyPopularity;
+module.exports.allPosts = allPosts;
 
 // Set up the connection
 var connection = db.createConnection({
@@ -31,29 +32,13 @@ var connection = db.createConnection({
 // password: 'c89de916'
 });
 
-function handleDisconnect(connection) {
-  connection.on('error', function(err) {
-    if (!err.fatal) {
-      return;
-    }
 
-    if (err.code !== 'PROTOCOL_CONNECTION_LOST') {
-      throw err;
-    }
-
-    console.log('Re-connecting lost connection: ' + err.stack);
-
-    connection = mysql.createConnection(connection.config);
-    handleDisconnect(connection);
-    connection.connect();
-  });
-}
-
-handleDisconnect(connection);
 
 function createDB(creation_end) {
 	// Establish the connection
 	connection.connect();
+
+	connection.query('SET SESSION wait_timeout = 1000000000');
 
 // 	connection.query('DROP DATABASE IF EXISTS csc309');
 // 	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
@@ -67,7 +52,7 @@ function createDB(creation_end) {
 	// Creating blog table in the database tumblr
 	connection.query('CREATE TABLE IF NOT EXISTS `blog` ('+
 	'`hostname` varchar(250) NOT NULL,'+
-	'`liked_count` int(11) NOT NULL,'+
+	'`liked_count` int(11),'+
 	'PRIMARY KEY (`hostname`)'+
 	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
 	// Creating post table in the database tumblr
@@ -95,11 +80,6 @@ function createDB(creation_end) {
 	') ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
 	
 	connection.on('end', creation_end);
-}
-
-function closeDB(){
-	// Finish the connection
-	connection.end();
 }
 
 // Write blog on DB
@@ -349,7 +329,23 @@ function getAllBlogs(cb){
 	
 }
 
+var aux;
+var allPosts = JSON.parse('{"trending":[]}');
+var n = 0;
+
+function alterAux(x, y){
+	y.tracking = x;
+	aux = y;
+	allPosts.trending[n] = aux;
+	n = n + 1;
+}
+
 function getPostbyPopularity(limit, cb){
+
+	allPosts = JSON.parse('{"trending":[]}');
+	n = 0;
+	
+	// Retrieve All posts ordered by popularity
 	var query = 'SELECT post.url, post.text, post.image, post.date, post.last_track, post.last_count\
 	FROM post\
 	INNER JOIN track\
@@ -367,21 +363,19 @@ function getPostbyPopularity(limit, cb){
 			var trending = '';
 			
 			// For each post
-			for(var i=0; rows[i] != undefined; i++){
+			for(var i=0; rows[i] != undefined && i<limit; i++){
 				
 				var post = rows[i];
 				
 				getAllTracks(post, function(tracks){
 					
-					post.tracking = tracks;
-					
+					//post.tracking = tracks;
+					alterAux(tracks, post);
+					cb(allPosts);
 				});
-				
-				getByPop.trending[i] = post;
 				
 			}
 			
-			cb(getByPop);
 		}
 	});
 	

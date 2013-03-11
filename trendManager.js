@@ -12,9 +12,13 @@ function trendAll (req, res){
 	
 	db.getPostbyPopularity(2, function(posts){
 		
-		posts.order = 'Trending';
-		console.info(posts);
+		//posts.order = 'Trending';
+		//console.info(posts);
+		
+		console.log(posts);
+		res.send(posts);
 	});
-
-	res.send(200);
+	
+	
+	
 }
