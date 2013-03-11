@@ -76,6 +76,11 @@ function trendAll (req, res){
 	
 	function chunkPost(posts, end){
 	
+		if(posts == 404){
+			res.send(404);
+			return;
+		}
+	
 		allPosts.trending[countPost] = posts;
 
 		countPost += 1;
