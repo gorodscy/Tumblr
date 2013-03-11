@@ -345,7 +345,8 @@ function getPostbyPopularity(limit, cb){
 	connection.query(query, function(err, rows){
 		if(err) throw err;
 		
-		if(rows != undefined) {
+		// If has any results
+		if(rows[0] != undefined) {
 			
 			// For each post
 			for(var i=0; rows[i] != undefined && i<limit; i++){
@@ -359,6 +360,10 @@ function getPostbyPopularity(limit, cb){
 				
 				
 			}
+		}
+		// If not find
+		else {
+			cb(404, 1);
 		}
 	});
 	
@@ -380,7 +385,8 @@ function getPostRecent(limit, cb){
 	connection.query(query, function(err, rows){
 		if(err) throw err;
 		
-		if(rows != undefined) {
+		// If has any results
+		if(rows[0] != undefined) {
 			
 			// For each post
 			for(var i=0; rows[i] != undefined && i<limit; i++){
@@ -394,6 +400,10 @@ function getPostRecent(limit, cb){
 				
 				
 			}
+		}
+		// If not find
+		else {
+			cb(404, 1);
 		}
 	});
 	
