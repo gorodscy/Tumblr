@@ -178,10 +178,11 @@ function writePost(post, hostname_blog, liked_count){
 
 // Update post in DB:
 function updatePost(post, hostname_blog, liked_count){
-	// get Timestamp
+	// get Timestamp, url, last track and last count
 	var timestamp=displayTime();
-	// get url
 	var url = post.post_url;
+	var last_track = timestamp;
+	var last_count = post.note_count;
 	
 	// Test if post already exists in DB
 	connection.query('SELECT * FROM post WHERE url = "' + url + '"', function(err, rows){
@@ -193,11 +194,8 @@ function updatePost(post, hostname_blog, liked_count){
 			writePost(post, hostname_blog, liked_count);
 			
 		}
+		// If post exists
 		else {
-	
-			var url = post.post_url;
-			var last_track = timestamp;
-			var last_count = post.note_count;
 	
 			connection.query('UPDATE post SET last_track = "' + last_track +  '", last_count = ' 
 								+ last_count + ' WHERE url = "' + url + '"');
