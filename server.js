@@ -7,7 +7,7 @@ express = require('express');
 var port = 31010;
 
 // Making a function be executed every hour:
-var interval = 3600000; // 1 hour in milliseconds
+var interval = 10000;//3600000; // 1 hour in milliseconds
 
 // Create an express application
 var app = express();
