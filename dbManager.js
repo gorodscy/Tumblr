@@ -127,13 +127,13 @@ function updateBlog(hostname, liked_count, liked_posts){
 	
 	// For each liked post (maximum 20)
 	for(var i=0; i<liked_count && i<20; i++) {
-		updatePost(liked_posts[i], hostname);
+		updatePost(liked_posts[i], hostname, liked_count);
 	}
 	
 }
 
 // Writing post in DB:
-function writePost(post, hostname_blog){
+function writePost(post, hostname_blog, liked_count){
 	//get Timestamp
 	var timestamp=displayTime();
 	
@@ -146,6 +146,7 @@ function writePost(post, hostname_blog){
 	connection.query('SELECT * FROM post WHERE url = "' + url + '"', function(err, rows){
 		if(err) throw err;
 		
+		// If do not exist
 		if(rows[0] == undefined){
 	
 			if(post.type == 'photo') {
@@ -163,6 +164,13 @@ function writePost(post, hostname_blog){
 			connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
 				VALUES (?, ?, ?, ?, ?)', [timestamp, 1, 0, post.note_count, url]);
 				
+		}
+		else {
+			// post already been tracked.
+			// We do not need to follow it again, so
+			// decrease the liked_count of the blog who liked it (the second one)
+			// Test if hostname already exists in DB
+			connection.query('UPDATE blog SET liked_count = ' + liked_count-1 + ' WHERE hostname = "' + hostname_blog + '"');
 		}
 	});
 }
