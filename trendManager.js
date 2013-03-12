@@ -5,7 +5,6 @@ module.exports.trendBlog = trendBlog;
 module.exports.trendAll = trendAll;
 
 var allPosts = JSON.parse('{"trending":[]}');
-var allPostsCopy = JSON.parse('{"trending":[]}');
 
 var countPost = 0;
 
@@ -46,14 +45,12 @@ function trendBlog (req, res){
 			// Order and limit just need to be set once
 			allPosts.order = order;
 			allPosts.limit = limit;
-			//We need to reset the variable allPosts, so we are using another variable called
-			//allPostsC
-			allPostsCopy = allPosts;
-			allPosts = JSON.parse('{"trending":[]}');
+		
 			// Reset count
 			countPost = 0;
 			// Send the result to user
-			res.send(allPostsCopy);
+			res.send(allPosts);
+			allPosts = JSON.parse('{"trending":[]}');
 		}		
 	}
 	
@@ -95,12 +92,12 @@ function trendAll (req, res){
 			// Order and limit just need to be set once
 			allPosts.order = order;
 			allPosts.limit = limit;
-			allPostsCopy = allPosts;
-			allPosts = JSON.parse('{"trending":[]}');
+		
 			// Reset count
 			countPost = 0;
 			// Send the result to user
-			res.send(allPostsCopy);
+			res.send(allPosts);
+			allPosts = JSON.parse('{"trending":[]}');
 		}		
 	}
 	
