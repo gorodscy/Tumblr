@@ -13,7 +13,7 @@ var interval = 3600000; // 1 hour in milliseconds
 var app = express();
 
 // Configuring the app
-app.configure(function () {
+app.configure(function (req, res) {
 	app.use(express.bodyParser());
 });
 
@@ -30,6 +30,8 @@ app.listen(port);
 
 var runningFunction = setInterval(everyhourFunction, interval);
 
+
+
 db.createDB(function(){
 	// Lauch the tracker as soon as the server begin
 	everyhourFunction();
@@ -44,3 +46,4 @@ function everyhourFunction() {
 
 // [If necessary] Removing the running condition:
 //clearInterval(interval);
+

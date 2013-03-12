@@ -34,7 +34,12 @@ var connection = db.createConnection({
 // 	password: 'c89de916'
 });
 
-
+setInterval(keepAlive, 60000);
+function keepAlive() {
+    connection.query('SELECT 1');
+    console.log("Fired Keep-Alive");
+    return;
+}
 
 function createDB(creation_end) {
 	// Establish the connection
@@ -547,3 +552,4 @@ function displayTime() {
 
 	return str;
 }
+
