@@ -21,14 +21,14 @@ module.exports.getBlogPostbyPopularity = getBlogPostbyPopularity;
 
 // Set up the connection
 var connection = db.createConnection({
-// 	host: 'csc309.db.9068705.hostedresource.com',
-// 	user: 'csc309',
-// 	password: 'C@nada2013'
-	host: 'localhost',
-	port: 8889,
-	database: "tumblr",
-	user: 'gorodscy',
-	password: '123'
+	host: 'csc309.db.9068705.hostedresource.com',
+	user: 'csc309',
+	password: 'C@nada2013'
+// 	host: 'localhost',
+// 	port: 8889,
+// 	database: "tumblr",
+// 	user: 'gorodscy',
+// 	password: '123'
 // 	host: 'localhost',
 // 	user: 'c3curygo',
 // 	password: 'c89de916'
@@ -43,11 +43,11 @@ function createDB(creation_end) {
 	connection.query('SET SESSION wait_timeout = 1000000000');
 
 // 	connection.query('DROP DATABASE IF EXISTS csc309');
-// 	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
-// 	connection.query('USE csc309');
-	connection.query('DROP DATABASE IF EXISTS tumblr');
-	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
-	connection.query('USE tumblr');
+	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
+	connection.query('USE csc309');
+// 	connection.query('DROP DATABASE IF EXISTS tumblr');
+// 	connection.query('CREATE DATABASE IF NOT EXISTS tumblr'); // Creating a database
+// 	connection.query('USE tumblr');
 // 	connection.query('DROP DATABASE IF EXISTS csc309h_c3curygo');
 // 	connection.query('CREATE DATABASE IF NOT EXISTS csc309h_c3curygo'); // Creating a database
 // 	connection.query('USE csc309h_c3curygo');
@@ -89,14 +89,14 @@ function saveBlog(hostname, liked_count, liked_posts){
 	
 	// Test if hostname already exists in DB
 	connection.query('SELECT * FROM blog WHERE hostname = "' + hostname + '"', function(err, rows){
-		if(err) throw err;
+		if(err){console.info(err); throw err;}
 		
 		if(rows[0] == undefined){
 			connection.query('INSERT INTO blog (hostname, liked_count) VALUES (?, ?)', [hostname, liked_count]);
-	
+			
 			// For each liked post (maximum 20)
-			for(var i=0; i<liked_count && i<20; i++) {
-				writePost(liked_posts[i], hostname);
+			for(var i=0; i<liked_posts.length && i<20; i++) {
+				writePost(liked_posts[i], hostname, liked_count);
 			}
 		}
 	});
@@ -126,7 +126,7 @@ function updateBlog(hostname, liked_count, liked_posts){
 	connection.query('UPDATE blog SET liked_count = ' + liked_count + ' WHERE hostname = "' + hostname + '"');
 	
 	// For each liked post (maximum 20)
-	for(var i=0; i<liked_count && i<20; i++) {
+	for(var i=0; i<liked_posts.length && i<20; i++) {
 		updatePost(liked_posts[i], hostname, liked_count);
 	}
 	
@@ -170,40 +170,50 @@ function writePost(post, hostname_blog, liked_count){
 			// We do not need to follow it again, so
 			// decrease the liked_count of the blog who liked it (the second one)
 			// Test if hostname already exists in DB
-			connection.query('UPDATE blog SET liked_count = ' + liked_count-1 + ' WHERE hostname = "' + hostname_blog + '"');
+			connection.query('UPDATE blog SET liked_count = ' + (liked_count-1) + ' WHERE hostname = "' + hostname_blog + '"');
 		}
 	});
 }
 
 
 // Update post in DB:
-function updatePost(post, hostname_blog){
+function updatePost(post, hostname_blog, liked_count){
 	// get Timestamp
 	var timestamp=displayTime();
-	
-	// Check if exists
-	
-	// If no: redirect to writePost and return here;
-	
-	// IF yes:
-	
+	// get url
 	var url = post.post_url;
-	var last_track = timestamp;
-	var last_count = post.note_count;
 	
-	connection.query('UPDATE post SET last_track = "' + last_track +  '", last_count = ' 
-						+ last_count + ' WHERE url = "' + url + '"');
+	// Test if post already exists in DB
+	connection.query('SELECT * FROM post WHERE url = "' + url + '"', function(err, rows){
+		if(err) throw err;
+		
+		// If do not exist redirect to writePost;
+		if(rows[0] == undefined){
+			
+			writePost(post, hostname_blog, liked_count);
+			
+		}
+		else {
+	
+			var url = post.post_url;
+			var last_track = timestamp;
+			var last_count = post.note_count;
+	
+			connection.query('UPDATE post SET last_track = "' + last_track +  '", last_count = ' 
+								+ last_count + ' WHERE url = "' + url + '"');
 					
 	
-	getLastTrack(post, function(last_track){
+			getLastTrack(post, function(last_track){
 		
-		var sequence = last_track.sequence + 1;
-		var increment = post.note_count - last_track.count;
+				var sequence = last_track.sequence + 1;
+				var increment = post.note_count - last_track.count;
 		
-		// Write track
-		connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
-		VALUES (?, ?, ?, ?, ?)', [timestamp, sequence, increment, post.note_count, url]);
+				// Write track
+				connection.query('INSERT INTO track (timestamp, sequence, increment, count, url_post) \
+				VALUES (?, ?, ?, ?, ?)', [timestamp, sequence, increment, post.note_count, url]);
 		
+			});
+		}
 	});
 }
 
@@ -364,7 +374,7 @@ function getPostbyPopularity(limit, cb){
 		if(rows[0] != undefined) {
 			
 			// For each post
-			for(var i=0; rows[i] != undefined && i<limit; i++){
+			for(var i=0; i<rows.length && i<limit; i++){
 				
 				getAllTracks(rows[i], function(tracks, post){
 					
@@ -404,7 +414,7 @@ function getPostRecent(limit, cb){
 		if(rows[0] != undefined) {
 			
 			// For each post
-			for(var i=0; rows[i] != undefined && i<limit; i++){
+			for(var i=0; i<rows.length && i<limit; i++){
 				
 				getAllTracks(rows[i], function(tracks, post){
 					
@@ -444,7 +454,7 @@ function getBlogPostRecent(hostname, limit, cb){
 		// If has any results
 		if(rows[0] != undefined) {
 			// For each post
-			for(var i=0; rows[i] != undefined; i++){
+			for(var i=0; i<rows.length; i++){
 				
 				getAllTracks(rows[i], function(tracks, post){
 					
@@ -482,7 +492,7 @@ function getBlogPostbyPopularity(hostname, limit, cb){
 		if(rows[0] != undefined) {
 			
 			// For each post
-			for(var i=0; rows[i] != undefined && i<limit; i++){
+			for(var i=0; i<rows.length && i<limit; i++){
 				
 				getAllTracks(rows[i], function(tracks, post){
 					

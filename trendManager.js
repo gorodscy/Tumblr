@@ -16,7 +16,7 @@ function trendBlog (req, res){
 	var hostname = req.params.hostname;
 	
 	// Check if limit not set
-	if(limit == undefined){
+	if(limit == undefined || limit > 20){
 		limit = 20;
 	}
 	
@@ -63,7 +63,7 @@ function trendAll (req, res){
 	var order = req.params.order;
 	
 	// Check if limit not set
-	if(limit == undefined){
+	if(limit == undefined || limit > 20){
 		limit = 20;
 	}
 	
