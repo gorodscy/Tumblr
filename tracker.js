@@ -29,6 +29,10 @@ api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 		// Callback function to send the statusCode to the POST request
 		cb(res.statusCode);
 		
+		// If blog not found, return error;
+		if(res.statusCode == 404)
+			return;
+		
 		// Create a variable to accumulate data.
 		// It is necessary because the data could be to long.
 		// Otherwise it could only be possible to receive two posts.
@@ -75,6 +79,10 @@ api_key=ZtJYLO0HI9tPYsC2pqCy6ciItK3XxWL9KgQErmo2TsknKtNtEp';
 		// It is necessary because the data could be to long.
 		// Otherwise it could only be possible to receive two posts.
 		var data = '';
+		
+		// If blog not found, return error;
+		if(res.statusCode == 404)
+			return;
 
 		res.on('data', function (chunk) {
 	

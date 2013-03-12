@@ -42,7 +42,7 @@ function createDB(creation_end) {
 
 	connection.query('SET SESSION wait_timeout = 1000000000');
 
-// 	connection.query('DROP DATABASE IF EXISTS csc309');
+	connection.query('DROP DATABASE IF EXISTS csc309');
 	connection.query('CREATE DATABASE IF NOT EXISTS csc309'); // Creating a database
 	connection.query('USE csc309');
 // 	connection.query('DROP DATABASE IF EXISTS tumblr');
